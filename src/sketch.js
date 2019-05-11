@@ -9,7 +9,7 @@ function sketch(p) {
   p.setup = () => {
     p.createCanvas(WIDTH, HEIGHT, p.WEBGL);
     flock = new Flock();
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < 50; i++) {
       const b = new Boid(p);
       flock.addBoid(b);
     }
@@ -95,9 +95,8 @@ class Boid {
   render = function() {
     this.p.push();
     this.p.translate(this.position.x, this.position.y, this.position.z);
-    // this.p.rotateX(this.velocity.x)
-    // this.p.rotateY(this.velocity.y)
-    // this.p.rotateZ(this.velocity.z)
+    this.p.rotateZ(this.p.createVector(this.velocity.x, this.velocity.y).heading() - this.p.PI / 2)
+    this.p.rotateX(this.p.createVector(this.velocity.y, this.velocity.z).heading())
     this.p.cone(this.r, this.h, 3, 2);
     this.p.pop();
   }
