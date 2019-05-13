@@ -2,26 +2,32 @@
 const WIDTH = 500;
 const HEIGHT = 500;
 
+const COLORS = {
+  '19013000': [240, 223, 121],
+  '13005000': [131, 216, 251],
+  '17001013': [134, 235, 192],
+  // '13005000': [234, 126, 132],
+  // '13005000': [150, 136, 240],
+};
+
 function sketch(p) {
-  let transactions;
   let flock;
 
   p.setup = () => {
     p.createCanvas(WIDTH, HEIGHT, p.WEBGL);
     p.perspective(p.PI / 3.0, p.width / p.height, 0.1, 500);
     flock = new Flock();
-    for (let i = 0; i < 100; i++) {
-      const b = new Boid(p);
-      flock.addBoid(b);
-    }
   }
 
   p.myCustomRedrawAccordingToNewPropsHandler = props => {
-    transactions = props.transactions;
+    props.transactions.forEach(transaction => {
+      const b = new Boid(p, transaction);
+      flock.addBoid(b);
+    });
   }
 
   p.draw = () => {
-    p.background(51);
+    p.background(246);
     flock.run();
   }
 }
@@ -45,6 +51,7 @@ class Flock {
 class Boid {
   constructor(p, transaction) {
     this.p = p;
+    this.color = p.color(...COLORS[transaction.category_id]);
     this.acceleration = p.createVector(0, 0, 0);
     this.velocity = p.createVector(p.random(-1, 1), p.random(-1, 1), p.random(-1, 1));
     this.position = p.createVector(0, 0, 0);
@@ -85,26 +92,23 @@ class Boid {
 
   // Wraparound
   borders = () => {
-    const r = this.position.z / 300.0;
-    const lim = 250 - r * 170;
-    if (this.position.x < -lim)  this.position.x = lim;
-    if (this.position.y < -lim)  this.position.y = lim;
-    if (this.position.x > lim) this.position.x = -lim;
-    if (this.position.y > lim) this.position.y = -lim;
-    if (this.position.z > 300) this.position.z = 0;
-    if (this.position.z < 0) this.position.z = 300;
+    const maxZ = 300.0;
+    const r = this.position.z / maxZ;
+    const lim = (WIDTH / 2) - (r * 170);
+    if (this.position.x < -lim - this.r)  this.position.x = lim;
+    if (this.position.y < -lim - this.h)  this.position.y = lim;
+    if (this.position.x > lim + this.r) this.position.x = -lim;
+    if (this.position.y > lim + this.h) this.position.y = -lim;
+    if (this.position.z > maxZ) this.position.z = 0;
+    if (this.position.z < 0) this.position.z = maxZ;
   }
 
   render = function() {
-    // Max z = 400
-    // min z = 0);
     this.p.push();
+    this.p.fill(this.color)
     this.p.translate(this.position.x, this.position.y, this.position.z);
     this.p.rotateZ(this.p.createVector(this.velocity.x, this.velocity.y).heading() - this.p.PI / 2)
     this.p.rotateX(this.p.createVector(this.velocity.y, this.velocity.z).heading())
-    // this.p.translate(250, 0, 0);
-    //this.p.translate(80, 0, 300);
-    // this.p.translate(165, 165, 150);
     this.p.cone(this.r, this.h, 3, 2);
     this.p.pop();
   }
