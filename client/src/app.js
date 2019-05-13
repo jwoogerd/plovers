@@ -1,12 +1,16 @@
  /* global Plaid */
+import axios from 'axios';
 import envvar from 'envvar';
-import plaid from 'plaid';
 import React, { Component } from 'react';
 import Button from 'react-bootstrap/Button';
 import P5Wrapper from 'react-p5-wrapper';
 
 import './app.css';
 import sketch from './sketch';
+
+const api = axios.create({
+  baseURL: 'https://localhost:3000',
+});
 
 // TODO: delete ME
 const dummy = [{
@@ -58,23 +62,8 @@ const dummy = [{
 },
 ];
 
-
-const PLAID_CLIENT_ID = envvar.string('REACT_APP_PLAID_CLIENT_ID');
 const PLAID_PUBLIC_KEY = envvar.string('REACT_APP_PLAID_PUBLIC_KEY')
-const PLAID_SECRET = envvar.string('REACT_APP_PLAID_SECRET');
 const PLAID_ENV = envvar.string('REACT_APP_PLAID_ENV');
-
-let PUBLIC_TOKEN;
-let ACCESS_TOKENS = [];
-const ITEM_IDS = [];
-
-const client = new plaid.Client(
-  PLAID_CLIENT_ID,
-  PLAID_SECRET,
-  PLAID_PUBLIC_KEY,
-  plaid.environments[PLAID_ENV],
-  { version: '2018-05-22' }
-);
 
 class App extends Component {
   constructor(props) {
@@ -84,14 +73,6 @@ class App extends Component {
     };
   }
 
-  // TODO: delete me
-  componentDidMount() {
-    setTimeout(() => {
-      this.setState({ transactions: dummy })
-      console.log(this.state)
-    }, 2000)
-  }
-
   plaidLink = Plaid.create({
     apiVersion: 'v2',
     clientName: 'Plovers',
@@ -99,13 +80,9 @@ class App extends Component {
     product: 'transactions',
     key: PLAID_PUBLIC_KEY,
     onSuccess: async public_token => {
-      PUBLIC_TOKEN = public_token;
       try {
-        const { access_token, item_id } = await client.exchangePublicToken(PUBLIC_TOKEN);
-        ACCESS_TOKENS.push(access_token);
-        ITEM_IDS.push(item_id);
-        // access_token = 'public-sandbox-f31c1dc5-da73-4cff-95e9-bf3a7f7c13ab'
-        const { transactions } = await client.getAllTransactions(access_token);
+        await api.post('/get_access_token', { public_token });
+        const { transactions } = await api.get('/transactions');
         console.log(transactions);
         this.setState({ transactions });
       } catch(err) {
