@@ -1,13 +1,27 @@
 /* global p5 */;
+const _ = require('lodash');
+
 const WIDTH = 500;
 const HEIGHT = 500;
+const COLORS = {};
+const PALETTE = [
+  [240, 223, 121],
+  [131, 216, 251],
+  [134, 235, 192],
+  [234, 126, 132],
+  [150, 136, 240],
+];
 
-const COLORS = {
-  '19013000': [240, 223, 121],
-  '13005000': [131, 216, 251],
-  '17001013': [134, 235, 192],
-  // '13005000': [234, 126, 132],
-  // '13005000': [150, 136, 240],
+let index = 0;
+const getColor = category => {
+  let color = _.get(COLORS, category);
+  if (!color) {
+    color = PALETTE[index];
+    COLORS[category] = color;
+    index += 1;
+    index %= PALETTE.length;
+  }
+  return color;
 };
 
 function sketch(p) {
@@ -20,7 +34,7 @@ function sketch(p) {
   }
 
   p.myCustomRedrawAccordingToNewPropsHandler = props => {
-    props.transactions.forEach(transaction => {
+    _.forEach(props.transactions, transaction => {
       const b = new Boid(p, transaction);
       flock.addBoid(b);
     });
@@ -50,13 +64,14 @@ class Flock {
 
 class Boid {
   constructor(p, transaction) {
+    const ratio = transaction.amount / 1000.0;
     this.p = p;
-    this.color = p.color(...COLORS[transaction.category_id]);
+    this.color = p.color(...getColor(transaction.category_id));
     this.acceleration = p.createVector(0, 0, 0);
     this.velocity = p.createVector(p.random(-1, 1), p.random(-1, 1), p.random(-1, 1));
     this.position = p.createVector(0, 0, 0);
-    this.r = 10;
-    this.h = 30;
+    this.r = 10 + ratio * 4;
+    this.h = 30 + ratio * 4;
     this.maxspeed = 3;
     this.maxforce = 0.05;
   }

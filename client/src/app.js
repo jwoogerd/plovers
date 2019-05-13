@@ -8,60 +8,7 @@ import P5Wrapper from 'react-p5-wrapper';
 import './app.css';
 import sketch from './sketch';
 
-const api = axios.create({
-  baseURL: 'https://localhost:3000',
-});
-
-// TODO: delete ME
-const dummy = [{
-    "amount": 2307.21,
-    "category": [
-      "Shops",
-      "Computers and Electronics"
-    ],
-    "category_id": "19013000",
-    "transaction_type": "place"
-    }, {
-    "amount": 78.5,
-    "category": [
-      "Food and Drink",
-      "Restaurants"
-    ],
-    "category_id": "13005000",
-    "name": "Golden Crepes",
-    "transaction_type": "place"
-  }, {
-    "amount": 78.5,
-    "category": [
-      "Food and Drink",
-      "Restaurants"
-    ],
-    "category_id": "13005000",
-    "name": "Golden Crepes",
-    "transaction_type": "place"
- },
- {
-  "amount": 78.5,
-  "category": [
-    "Food and Drink",
-    "Restaurants"
-  ],
-  "category_id": "13005000",
-  "name": "Golden Crepes",
-  "transaction_type": "place"
-},
-{
-  "amount": 78.5,
-  "category": [
-    "Food and Drink",
-    "Restaurants"
-  ],
-  "category_id": "17001013",
-  "name": "Golden Crepes",
-  "transaction_type": "place"
-},
-];
-
+const api = axios.create({ baseURL: 'http://localhost:3000' });
 const PLAID_PUBLIC_KEY = envvar.string('REACT_APP_PLAID_PUBLIC_KEY')
 const PLAID_ENV = envvar.string('REACT_APP_PLAID_ENV');
 
@@ -82,15 +29,22 @@ class App extends Component {
     onSuccess: async public_token => {
       try {
         await api.post('/get_access_token', { public_token });
-        const { transactions } = await api.get('/transactions');
-        console.log(transactions);
-        this.setState({ transactions });
+        const { data } = await api.get('/transactions');
+        this.setState({ transactions: data.transactions });
       } catch(err) {
         console.log(err);
-        this.setState({ transactions: dummy });  // DELETE ME
       }
     },
   });
+
+  // componentDidMount() {
+  //   return api.get('/transactions')
+  //   .then(({ data }) => {
+  //     console.log(data.transactions)
+  //     this.setState({ transactions: data.transactions });
+  //   })
+  //   .catch(console.log);
+  // }
 
   render() {
     return (

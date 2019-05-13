@@ -1,4 +1,5 @@
 const bodyParser = require('body-parser');
+const cors = require('cors');
 const envvar = require('envvar');
 const express = require('express');
 const moment = require('moment');
@@ -29,9 +30,11 @@ const client = new plaid.Client(
 const app = express();
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+app.use(cors({ origin: true }));
 
 // Exchange token flow - exchange a Link public_token for
 app.post('/get_access_token', async function(request, response, next) {
+  console.log('request', request.body.public_token)
   PUBLIC_TOKEN = request.body.public_token;
   try {
     const { access_token, item_id } = await client.exchangePublicToken(PUBLIC_TOKEN);
@@ -42,7 +45,7 @@ app.post('/get_access_token', async function(request, response, next) {
       item_id: ITEM_ID,
       error: null,
     });
-  } catch(error) {
+  } catch (error) {
     console.log(error);
     return response.json({ error });
   }
@@ -50,16 +53,18 @@ app.post('/get_access_token', async function(request, response, next) {
 
 app.get('/transactions', async function(request, response, next) {
   // Pull transactions for the Item for the last 30 days
-  const startDate = moment().subtract(30, 'days').format('YYYY-MM-DD');
+  const startDate = moment().subtract(90, 'days').format('YYYY-MM-DD');
   const endDate = moment().format('YYYY-MM-DD');
   try {
+    // ACCESS_TOKEN = 'access-sandbox-8518bd00-1f46-4a4f-b019-60a68e02f902'
     const transactionResponse = await client.getTransactions(ACCESS_TOKEN, startDate, endDate, {
       count: 250,
       offset: 0,
     });
-    console.log(transactionResponse);
-    return response.json({ error: null, transactions: transactionResponse });
-  } catch(error) {
+    const { transactions } = transactionResponse;
+    console.log(transactions);
+    return response.json({ error: null, transactions });
+  } catch (error) {
     console.log(error);
     return response.json({ error });
   }
