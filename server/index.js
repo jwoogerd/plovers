@@ -56,13 +56,11 @@ app.get('/transactions', async function(request, response, next) {
   const startDate = moment().subtract(90, 'days').format('YYYY-MM-DD');
   const endDate = moment().format('YYYY-MM-DD');
   try {
-    // ACCESS_TOKEN = 'access-sandbox-8518bd00-1f46-4a4f-b019-60a68e02f902'
     const transactionResponse = await client.getTransactions(ACCESS_TOKEN, startDate, endDate, {
       count: 250,
       offset: 0,
     });
     const { transactions } = transactionResponse;
-    console.log(transactions);
     return response.json({ error: null, transactions });
   } catch (error) {
     console.log(error);

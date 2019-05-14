@@ -30,21 +30,13 @@ class App extends Component {
       try {
         await api.post('/get_access_token', { public_token });
         const { data } = await api.get('/transactions');
-        this.setState({ transactions: data.transactions });
+        const transactions = this.state.transactions.concat(data.transactions);
+        this.setState({ transactions });
       } catch(err) {
         console.log(err);
       }
     },
   });
-
-  // componentDidMount() {
-  //   return api.get('/transactions')
-  //   .then(({ data }) => {
-  //     console.log(data.transactions)
-  //     this.setState({ transactions: data.transactions });
-  //   })
-  //   .catch(console.log);
-  // }
 
   render() {
     return (
@@ -52,7 +44,7 @@ class App extends Component {
         <header className="App-header">Plovers</header>
         <P5Wrapper sketch={sketch} transactions={this.state.transactions}/>
         <Button variant="primary" onClick={() => this.plaidLink.open()}>
-          Connect to Plaid
+          Connect To Plaid To Add Plovers
         </Button>
       </div>
     );
