@@ -21,7 +21,7 @@ function sketch(p) {
   }
 
   p.draw = () => {
-    p.background(246);
+    p.background(0);
     if (flock.boids.length === 0) {
       p.translate(0, 0, 50)
       p.fill(p.color(PALETTE[3]));

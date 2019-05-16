@@ -34,7 +34,6 @@ app.use(cors({ origin: true }));
 
 // Exchange token flow - exchange a Link public_token for
 app.post('/get_access_token', async function(request, response, next) {
-  console.log('request', request.body.public_token)
   PUBLIC_TOKEN = request.body.public_token;
   try {
     const { access_token, item_id } = await client.exchangePublicToken(PUBLIC_TOKEN);
