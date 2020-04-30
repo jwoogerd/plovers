@@ -1,5 +1,5 @@
-export const WIDTH = 600;
-export const HEIGHT = 600;
+export const WIDTH = 550;
+export const HEIGHT = 500;
 export const MAXZ = 360.0;
 export const PALETTE = [
   [240, 223, 121],

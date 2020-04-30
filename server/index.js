@@ -1,3 +1,4 @@
+const axios = require('axios');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const envvar = require('envvar');
@@ -16,6 +17,7 @@ const PLAID_ENV = envvar.string('PLAID_ENV', 'sandbox');
 let ACCESS_TOKEN = null;
 let PUBLIC_TOKEN = null;
 let ITEM_ID = null;
+let client_user_id = '12345678';
 
 // Initialize the Plaid client
 // Find your API keys in the Dashboard (https://dashboard.plaid.com/account/keys)
@@ -27,18 +29,47 @@ const client = new plaid.Client(
   {version: '2018-05-22'}
 );
 
+const api = axios.create({ baseURL: 'https://sandbox.plaid.com/' });
 const app = express();
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(cors({ origin: true }));
 
+// Get item add token
+app.post('/get_item_add_token', async function(request, response, next) {
+  try {
+    const { data } = await api.post('/item/add_token/create', {
+      client_id: PLAID_CLIENT_ID,
+      secret: PLAID_SECRET,
+      user: {
+        client_user_id,
+      },
+      link_configuration: {
+        redirect_uri: 'http://localhost:3030'
+      },
+    });
+    return response.json({
+      add_token: data.add_token,
+      error: null,
+    });
+  } catch (error) {
+    console.log(error);
+    return response.json({ error });
+  }
+});
+
 // Exchange token flow - exchange a Link public_token for
-app.post('/get_access_token', async function(request, response, next) {
+app.post('/get_access_token', async function (request, response, next) {
   PUBLIC_TOKEN = request.body.public_token;
   try {
-    const { access_token, item_id } = await client.exchangePublicToken(PUBLIC_TOKEN);
-    ACCESS_TOKEN = access_token;
-    ITEM_ID = item_id;
+    const { data } = await api.post('/item/public_token/exchange', {
+      client_id: PLAID_CLIENT_ID,
+      secret: PLAID_SECRET,
+      public_token: PUBLIC_TOKEN,
+      client_user_id,
+    });
+    ACCESS_TOKEN = data.access_token;
+    ITEM_ID = data.item_id;
     return response.json({
       access_token: ACCESS_TOKEN,
       item_id: ITEM_ID,
