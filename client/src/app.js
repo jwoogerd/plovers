@@ -9,7 +9,7 @@ import sketch from './sketch';
 
 const api = axios.create({ baseURL: 'http://localhost:3000' });
 const PLAID_ENV = envvar.string('REACT_APP_PLAID_ENV');
-const basePlaidURL = 'https://secure-testing.plaid.com/link/7fd6b1/link.html';
+const basePlaidURL = 'https://secure-testing.plaid.com/link/8f3bb8/link.html';
 
 const App = () => {
   const [transactions, setTransactions] = useState([]);
@@ -44,6 +44,8 @@ const App = () => {
           env: PLAID_ENV,
           product: 'transactions',
           token: data.add_token,
+          isWebview: true,
+          isMobile: false,
         });
         setLinkURL(`${basePlaidURL}?${params.toString()}`);
       } catch(err) {
