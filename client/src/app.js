@@ -10,7 +10,7 @@ import sketch from './sketch';
 
 const api = axios.create({ baseURL: 'http://localhost:3000' });
 const PLAID_ENV = envvar.string('REACT_APP_PLAID_ENV');
-const basePlaidURL = 'https://secure-testing.plaid.com/link/57642a/link.html';
+const basePlaidURL = 'https://secure-testing.plaid.com/link/v2/stable/link.html';
 
 const App = () => {
   const [transactions, setTransactions] = useState([]);
@@ -30,10 +30,8 @@ const App = () => {
         env: PLAID_ENV,
         product: 'transactions',
         token,
-        isWebview: true,
-        isMobile: false,
+        useRedirectUri: true,
         oauthStateId,
-        oauthNonce: token,
       });
       const url = `${basePlaidURL}?${params.toString()}`;
       window.location = url;
@@ -68,8 +66,7 @@ const App = () => {
           env: PLAID_ENV,
           product: 'transactions',
           token: data.add_token,
-          isWebview: true,
-          isMobile: false,
+          useRedirectUri: true,
         });
         if (!location.searchParams.has('public_token') && !location.searchParams.has('oauth_state_id')) {
           setShow(true);

@@ -44,7 +44,7 @@ app.post('/get_item_add_token', async function(request, response, next) {
       user: {
         client_user_id,
       },
-      link_configuration: {
+      options: {
         redirect_uri: 'http://localhost:3030'
       },
     });
