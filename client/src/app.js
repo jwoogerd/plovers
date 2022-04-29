@@ -1,4 +1,4 @@
- /* global Plaid */
+/* global Plaid */
 import axios from 'axios';
 import envvar from 'envvar';
 import React, { Component } from 'react';
@@ -23,16 +23,15 @@ class App extends Component {
   plaidLink = Plaid.create({
     apiVersion: 'v2',
     clientName: 'Plovers',
-    env: PLAID_ENV,
-    product: 'transactions',
-    key: PLAID_PUBLIC_KEY,
+    env: 'devenv',
+    token: '',
     onSuccess: async public_token => {
       try {
         await api.post('/get_access_token', { public_token });
         const { data } = await api.get('/transactions');
         const transactions = this.state.transactions.concat(data.transactions);
         this.setState({ transactions });
-      } catch(err) {
+      } catch (err) {
         console.log(err);
       }
     },
@@ -42,7 +41,7 @@ class App extends Component {
     return (
       <div className="App">
         <header className="App-header">Plovers</header>
-        <P5Wrapper sketch={sketch} transactions={this.state.transactions}/>
+        <P5Wrapper sketch={sketch} transactions={this.state.transactions} />
         <Button variant="primary" onClick={() => this.plaidLink.open()}>
           Connect To Plaid To Add Plovers
         </Button>
