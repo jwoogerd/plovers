@@ -1,54 +1,64 @@
- /* global Plaid */
 import axios from 'axios';
-import envvar from 'envvar';
-import React, { Component } from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
 import Button from 'react-bootstrap/Button';
-import P5Wrapper from 'react-p5-wrapper';
+import { ReactP5Wrapper } from 'react-p5-wrapper';
+
+import { usePlaidLink } from "react-plaid-link";
 
 import './app.css';
 import sketch from './sketch';
 
 const api = axios.create({ baseURL: 'http://localhost:3000' });
-const PLAID_PUBLIC_KEY = envvar.string('REACT_APP_PLAID_PUBLIC_KEY')
-const PLAID_ENV = envvar.string('REACT_APP_PLAID_ENV');
 
-class App extends Component {
-  constructor(props) {
-    super(props)
-    this.state = {
-      transactions: [],
-    };
-  }
+const App = () => {
+  const [transactions, setTransactions] = useState([])
+  const [linkConfiguration, setLinkConfiguration] = useState({})
 
-  plaidLink = Plaid.create({
-    apiVersion: 'v2',
-    clientName: 'Plovers',
-    env: PLAID_ENV,
-    product: 'transactions',
-    key: PLAID_PUBLIC_KEY,
-    onSuccess: async public_token => {
+  const onSuccess = useCallback(public_token => {
+    const getTransactions = async () => {
       try {
         await api.post('/get_access_token', { public_token });
         const { data } = await api.get('/transactions');
-        const transactions = this.state.transactions.concat(data.transactions);
-        this.setState({ transactions });
-      } catch(err) {
+        setTransactions(transactions.concat(data.transactions))
+      } catch (err) {
         console.log(err);
       }
-    },
+    }
+    getTransactions();
   });
 
-  render() {
-    return (
-      <div className="App">
-        <header className="App-header">Plovers</header>
-        <P5Wrapper sketch={sketch} transactions={this.state.transactions}/>
-        <Button variant="primary" onClick={() => this.plaidLink.open()}>
-          Connect To Plaid To Add Plovers
-        </Button>
-      </div>
-    );
-  }
+  useEffect(() => {
+    const intializeLink = async () => {
+      try {
+        const { data } = await api.get('/link_token');
+        let isOauth = false;
+        const config = {
+          token: data.token,
+          onSuccess,
+        };
+        if (window.location.href.includes("?oauth_state_id=")) {
+          config.receivedRedirectUri = window.location.href;
+          isOauth = true;
+        }
+        setLinkConfiguration(config)
+      } catch (err) {
+        console.log(err);
+      }
+    }
+    intializeLink();
+  }, [])
+
+  const { open, ready } = usePlaidLink(linkConfiguration);
+
+  return (
+    <div className="App">
+      <header className="App-header">Plovers</header>
+      <ReactP5Wrapper sketch={sketch} transactions={transactions} />
+      <Button variant="primary" onClick={() => open()} disabled={!ready}>
+        Connect To Plaid To Add Plovers
+      </Button>
+    </div>
+  );
 }
 
 export default App;

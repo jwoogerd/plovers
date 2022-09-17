@@ -3,14 +3,14 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "axios": "^0.18.0",
-    "bootstrap": "^4.3.1",
-    "envvar": "^2.0.0",
+    "axios": "^0.27.2",
+    "bootstrap": "^5.2.1",
     "lodash": "^4.17.11",
-    "react": "^16.8.6",
-    "react-bootstrap": "^1.0.0-beta.8",
-    "react-dom": "^16.8.6",
-    "react-p5-wrapper": "0.0.4",
+    "react": "^18.2.0",
+    "react-bootstrap": "^2.5.0",
+    "react-dom": "^18.2.0",
+    "react-p5-wrapper": "^3.3.0",
+    "react-plaid-link": "^3.3.2",
     "react-scripts": "3.0.0"
   },
   "scripts": {

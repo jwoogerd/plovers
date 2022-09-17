@@ -13,7 +13,7 @@ function sketch(p) {
     flock = new Flock();
   }
 
-  p.myCustomRedrawAccordingToNewPropsHandler = props => {
+  p.updateWithProps = props => {
     _.forEach(props.transactions, transaction => {
       const b = new Boid(p, transaction);
       flock.addBoid(b);
