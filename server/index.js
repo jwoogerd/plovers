@@ -3,10 +3,10 @@ const cors = require('cors');
 const express = require('express');
 const moment = require('moment');
 
-const { Configuration, PlaidApi, PlaidEnvironments } = require('plaid');
+const { Configuration, PlaidApi } = require('plaid');
 
 require('dotenv').config()
-const APP_PORT = process.env.APP_PORT || 3000;
+const APP_PORT = process.env.APP_PORT || 4000;
 const PLAID_CLIENT_ID = process.env.PLAID_CLIENT_ID;
 const PLAID_SECRET = process.env.PLAID_SECRET;
 const PLAID_ENV = process.env.PLAID_ENV || 'sandbox';
@@ -47,6 +47,7 @@ app.get('/link_token', async function (request, response, next) {
       user: {
         client_user_id: 'test-user',
       },
+      redirect_uri: 'http://localhost:3030',  // plovers frontend
     })
     console.log('token', data.link_token);
     return response.json({
@@ -68,6 +69,7 @@ app.post('/get_access_token', async function (request, response, next) {
       client_id: PLAID_CLIENT_ID,
       secret: PLAID_SECRET,
       public_token: PUBLIC_TOKEN,
+      client_user_id: 'test-user',
     });
     ACCESS_TOKEN = data.access_token;
     ITEM_ID = data.item_id;
