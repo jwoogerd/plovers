@@ -6,7 +6,7 @@ import { ReactP5Wrapper } from 'react-p5-wrapper';
 import './app.css';
 import sketch from './sketch';
 
-const api = axios.create({ baseURL: 'http://localhost:3000' });
+const api = axios.create({ baseURL: 'http://localhost:7000' });
 const basePlaidURL = 'http://localhost:8000/flink.html'
 
 const App = () => {
@@ -30,7 +30,7 @@ const App = () => {
 
   const onOauthSuccess = useCallback(oauthStateId => {
     const redirectWithOAuth = async oauthStateId => {
-      const token = sessionStorage.getItem('iat');
+      const token = sessionStorage.getItem('link_token');
       const params = new URLSearchParams({
         token,
         useRedirectUri: true,
@@ -49,6 +49,7 @@ const App = () => {
         const params = new URLSearchParams();
         params.set('useRedirectUri', 'true');
         params.set('token', data.token)
+        sessionStorage.setItem('link_token', data.token);
         if (!location.searchParams.has('public_token') && !location.searchParams.has('oauth_state_id')) {
           setLinkURL(`${basePlaidURL}?${params.toString()}`);
         }

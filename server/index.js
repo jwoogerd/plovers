@@ -6,7 +6,7 @@ const moment = require('moment');
 const { Configuration, PlaidApi } = require('plaid');
 
 require('dotenv').config()
-const APP_PORT = process.env.APP_PORT || 4000;
+const APP_PORT = process.env.APP_PORT || 7000;
 const PLAID_CLIENT_ID = process.env.PLAID_CLIENT_ID;
 const PLAID_SECRET = process.env.PLAID_SECRET;
 const PLAID_ENV = process.env.PLAID_ENV || 'sandbox';
@@ -22,9 +22,9 @@ let ITEM_ID = null;
 const configuration = new Configuration({
   basePath: process.env.PLAID_BASE_PATH,
   baseOptions: {
-    headers: {
-      'Plaid-Version': '2020-09-14',
-    },
+    // headers: {
+    //   'Plaid-Version': '2020-09-14',
+    // },
   },
 });
 const client = new PlaidApi(configuration);
