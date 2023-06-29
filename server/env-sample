@@ -1,0 +1,7 @@
+# PLAID_CLIENT_ID='569ed2f36b3a3a021713c928'
+# PLAID_SECRET='easypassword4you123456123'
+# PLAID_BASE_PATH='http://jwoogerd.devenv.plaid.io:50022'
+
+PLAID_CLIENT_ID=<CLIENT ID>
+PLAID_SECRET=<CLIENT SECRET>
+PLAID_BASE_PATH='https://sandbox.plaid.com'
