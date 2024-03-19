@@ -3,7 +3,7 @@ const cors = require('cors');
 const express = require('express');
 const moment = require('moment');
 
-const { Configuration, PlaidApi, PlaidEnvironments } = require('plaid');
+const { Configuration, PlaidApi } = require('plaid');
 
 require('dotenv').config()
 const APP_PORT = process.env.APP_PORT || 3000;
